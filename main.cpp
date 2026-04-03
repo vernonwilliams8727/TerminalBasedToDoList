@@ -108,6 +108,23 @@ bool deleteTask(sqlite3* db, int id) {
     return rc == SQLITE_DONE;
 }
 
+std::vector<std::string> searchLists(const std::vector<std::string>&query){
+    std::vector<std::string> results;
+    for(const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path())){
+        if(entry.is_regular_file() && entry.path().extension() == ".db"){
+            std::string stem = entry.path().stem().string();
+            for(const auto &q : query){
+                if(stem.find(q) != std::string::npos){
+                    results.push_back(stem);
+                    break;
+                }
+            }
+        }
+    }
+    return results;
+}
+
+
 int main(){
     std::cout << "Welcome User!" << std::endl;
     std::cout << "What would you like to do?" << std::endl << "Create New List(1)   " << "Open Existing List(2)   " << "Exit Program(3)" << std::endl;
@@ -176,7 +193,7 @@ int main(){
             }
         }
         else if(start == 2){
-            std::cout << "Please type the name of the list(s) you are looking for, Seperate them by hitting enter, press 'crtl + a' once you are done." << std::endl;
+            std::cout << "Please type the name of the list(s) you are looking for, Seperate them with a space, press 'Enter' once you are done." << std::endl;
             std::string input;
             std::cin.ignore();  
             while(true){
